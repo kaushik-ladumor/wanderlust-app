@@ -1,0 +1,375 @@
+<% layout('/layouts/boilerplate') %>
+<style>
+  :root {
+    --airbnb-red: #FF385C;
+    --airbnb-dark: #222222;
+    --airbnb-light-gray: #EBEBEB;
+    --airbnb-medium-gray: #717171;
+    --airbnb-border: 1px solid #DDDDDD;
+    --airbnb-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08);
+    --airbnb-transition: all 0.3s ease;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #FFFFFF;
+    color: var(--airbnb-dark);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container {
+    flex: 1 0 auto;
+    margin-bottom: 1.5rem;
+  }
+
+  .verification-card {
+    max-width: 450px; /* Reduced */
+    margin: 0.75rem auto; /* Reduced */
+    border-radius: 10px; /* Reduced */
+    background-color: #FFFFFF;
+    box-shadow: var(--airbnb-shadow);
+    border: none;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: #FFFFFF;
+    padding: 1.25rem 1.5rem 0.75rem; /* Reduced */
+    border-bottom: 1px solid var(--airbnb-light-gray);
+    text-align: center;
+  }
+
+  .airbnb-brand {
+    color: var(--airbnb-red);
+    font-weight: 700;
+    font-size: 1.25rem; /* Reduced */
+    letter-spacing: -0.5px;
+    margin-bottom: 0.25rem; /* Reduced */
+  }
+
+  .verification-subtitle {
+    color: var(--airbnb-medium-gray);
+    font-size: 0.85rem; /* Reduced */
+    margin: 0;
+  }
+
+  .card-body {
+    padding: 1.25rem 1.5rem; /* Reduced */
+  }
+
+  .email-confirmation {
+    background-color: #F7F7F7;
+    border-radius: 6px; /* Reduced */
+    padding: 0.75rem; /* Reduced */
+    margin-bottom: 1rem; /* Reduced */
+    text-align: center;
+  }
+
+  .email-highlight {
+    color: var(--airbnb-dark);
+    font-weight: 600;
+  }
+
+  .form-floating {
+    margin-bottom: 1rem; /* Reduced */
+  }
+
+  .form-control {
+    height: 48px; /* Reduced */
+    border-radius: 6px; /* Reduced */
+    padding: 0.625rem 0.875rem; /* Reduced */
+    border: var(--airbnb-border);
+    font-size: 0.9rem; /* Reduced */
+  }
+
+  .form-control:focus {
+    border-color: var(--airbnb-red);
+    box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+    outline: none;
+  }
+
+  .verify-btn {
+    background-color: var(--airbnb-red);
+    color: white;
+    font-weight: 600;
+    padding: 0.625rem; /* Reduced */
+    border-radius: 6px; /* Reduced */
+    border: none;
+    transition: var(--airbnb-transition);
+    width: 100%;
+    font-size: 0.9rem; /* Reduced */
+    min-height: 38px; /* Reduced */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem; /* Reduced */
+  }
+
+  .verify-btn:hover {
+    background-color: #E61E4D;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .verify-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .resend-link {
+    color: var(--airbnb-red);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--airbnb-transition);
+    font-size: 0.85rem; /* Reduced */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .resend-link:hover {
+    text-decoration: underline;
+    color: #E61E4D;
+  }
+
+  .alert {
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .alert .bi {
+    font-size: 1rem;
+  }
+
+  .alert-dismissible .btn-close {
+    padding: 0.75rem;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 991.98px) {
+    .verification-card {
+      max-width: 400px;
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem 0.5rem;
+    }
+
+    .card-body {
+      padding: 1rem 1.25rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .verification-card {
+      max-width: 360px;
+    }
+
+    .airbnb-brand {
+      font-size: 1.1rem;
+    }
+
+    .verification-subtitle {
+      font-size: 0.8rem;
+    }
+
+    .form-control {
+      height: 44px;
+      font-size: 0.85rem;
+    }
+
+    .verify-btn {
+      font-size: 0.85rem;
+      min-height: 36px;
+      padding: 0.5rem;
+    }
+
+    .resend-link {
+      font-size: 0.8rem;
+    }
+
+    .alert {
+      font-size: 0.85rem;
+      padding: 0.5rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .verification-card {
+      border-radius: 0;
+      box-shadow: none;
+      max-width: 100%;
+      margin: 0.5rem;
+    }
+
+    .card-header {
+      padding: 0.75rem 1rem 0.5rem;
+    }
+
+    .card-body {
+      padding: 0.75rem 1rem;
+    }
+
+    .email-confirmation {
+      padding: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .form-floating {
+      margin-bottom: 0.75rem;
+    }
+
+    .form-control {
+      height: 40px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .verify-btn {
+      padding: 0.4rem;
+      min-height: 32px;
+      font-size: 0.8rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .resend-link {
+      font-size: 0.75rem;
+    }
+
+    .alert {
+      font-size: 0.8rem;
+      padding: 0.4rem;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .container {
+      padding: 0.5rem;
+    }
+
+    .card-header {
+      padding: 0.5rem 0.75rem 0.4rem;
+    }
+
+    .card-body {
+      padding: 0.5rem 0.75rem;
+    }
+
+    .airbnb-brand {
+      font-size: 1rem;
+    }
+
+    .verification-subtitle {
+      font-size: 0.75rem;
+    }
+
+    .email-confirmation {
+      padding: 0.4rem;
+    }
+  }
+
+  /* Animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .verification-card {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+</style>
+
+<div class="container py-3"> <!-- Reduced padding -->
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      <div class="card verification-card border-0">
+        <!-- Card Header -->
+        <div class="card-header text-center border-0">
+          <h3 class="airbnb-brand mb-0">Verify Your Email</h3>
+          <p class="verification-subtitle">Enter your 6-digit verification code</p>
+        </div>
+        
+        <div class="card-body">
+          <!-- Flash Messages -->
+          <% if (success && success.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show mb-3 rounded-3" role="alert">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <div>Your OTP has been sent to your email. Check your spam or junk folder if you don’t see it in your inbox.</div>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+          <% if (error && error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show mb-3 rounded-3" role="alert">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <div><%= error %></div>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+          
+          <!-- Email Confirmation -->
+          <div class="email-confirmation">
+            <p class="mb-0">We sent a verification code to <span class="email-highlight"><%= email %></span></p>
+          </div>
+
+          <!-- Verification Form -->
+          <form action="/verify" method="POST" id="verifyForm">
+            <input type="hidden" name="email" value="<%= email %>">
+
+            <!-- Verification Code Input -->
+            <div class="form-floating">
+              <input 
+                type="text" 
+                class="form-control" 
+                id="code" 
+                name="code" 
+                placeholder="123456"
+                required
+                maxlength="6"
+                pattern="\d{6}"
+                title="Please enter a 6-digit code"
+                aria-required="true"
+              >
+              <label for="code">Verification code</label>
+            </div>
+
+            <!-- Verify Button -->
+            <button type="submit" class="verify-btn" aria-label="Verify Email">Verify Email</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto focus on code input
+  document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('code');
+    if (codeInput) {
+      codeInput.focus();
+      
+      // Auto-advance after 6 digits
+      codeInput.addEventListener('input', function() {
+        if (this.value.length === 6) {
+          document.getElementById('verifyForm').submit();
+        }
+      });
+    }
+  });
+</script>

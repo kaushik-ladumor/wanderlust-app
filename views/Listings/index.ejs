@@ -1,0 +1,253 @@
+<% layout('/layouts/boilerplate') %>
+
+<body>
+  <div class="listings-container">
+    <h1 class="listings-header">Explore Our Listings</h1>
+
+    <!-- Single toggle button -->
+    <button id="toggleGSTAll" type="button" class="gst-toggle-btn">
+      Show Price with GST for All
+    </button>
+
+    <div class="listings-grid">
+      <% for(let listing of allListings){ %>
+        <a href="/listings/<%= listing._id %>" class="listing-card">
+          <div class="listing-image-container">
+            <img src="<%= listing.image.url %>" class="listing-image" alt="<%= listing.title %>">
+          </div>
+          <div class="listing-details">
+            <h3 class="listing-title"><%= listing.title %></h3>
+            <div class="price-container">
+              <p class="listing-price" data-id="<%= listing._id %>" data-price="<%= listing.price %>">
+                ₹<%= listing.price.toLocaleString('en-IN') %> <span class="price-night">night</span>
+              </p>
+              <div class="gst-price"></div>
+            </div>
+          </div>
+        </a>
+      <% } %>
+    </div>
+  </div>
+
+  <style>
+    /* Base Styles */
+    :root {
+      --primary-color: #3a86ff;
+      --primary-dark: #2667cc;
+      --text-color: #333;
+      --text-light: #666;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .listings-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .listings-header {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    /* GST Toggle Button */
+    .gst-toggle-btn {
+      display: block;
+      margin: 0 auto 2rem;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--box-shadow);
+    }
+
+    .gst-toggle-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .gst-toggle-btn.active {
+      background-color: var(--primary-dark);
+    }
+
+    /* Listings Grid */
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 0 1rem;
+    }
+
+    .listing-card {
+      text-decoration: none;
+      color: inherit;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: var(--box-shadow);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .listing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .listing-image-container {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .listing-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+
+    .listing-card:hover .listing-image {
+      transform: scale(1.05);
+    }
+
+    .listing-details {
+      padding: 1.25rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .listing-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.75rem 0;
+      color: var(--text-color);
+    }
+
+    .price-container {
+      margin-top: auto;
+    }
+
+    .listing-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 0.5rem 0;
+    }
+
+    .price-night {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--text-light);
+    }
+
+    .gst-price {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #27ae60;
+      display: none;
+      margin-top: 0.25rem;
+    }
+
+    .original-price {
+      text-decoration: line-through;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+
+    .listing-price.show-gst {
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .listings-header {
+        font-size: 2rem;
+      }
+
+      .listings-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .listing-image-container {
+        height: 180px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .listings-header {
+        font-size: 1.75rem;
+      }
+
+      .listings-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+
+      .gst-toggle-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+
+  <script>
+    let gstShown = false;
+
+    document.getElementById('toggleGSTAll').addEventListener('click', () => {
+      gstShown = !gstShown;
+      const button = document.getElementById('toggleGSTAll');
+
+      // Select all price paragraphs
+      const priceElements = document.querySelectorAll('.listing-price');
+
+      for (const priceElem of priceElements) {
+        const originalPrice = Number(priceElem.dataset.price);
+        const gstElem = priceElem.nextElementSibling; // the gst-price div
+
+        if (gstShown) {
+          const gstPrice = originalPrice * 1.18;
+          priceElem.innerHTML = `<span class="original-price">₹${originalPrice.toLocaleString('en-IN')}</span>`;
+          gstElem.innerHTML = `₹${gstPrice.toFixed(0).toLocaleString('en-IN')} <span class="price-night">night (incl. GST)</span>`;
+          gstElem.style.display = 'block';
+          priceElem.classList.add('show-gst');
+        } else {
+          priceElem.innerHTML = `₹${originalPrice.toLocaleString('en-IN')} <span class="price-night">night</span>`;
+          gstElem.style.display = 'none';
+          gstElem.innerHTML = '';
+          priceElem.classList.remove('show-gst');
+        }
+      }
+
+      button.textContent = gstShown ? 'Show Original Price for All' : 'Show Price with GST for All';
+      button.classList.toggle('active', gstShown);
+    });
+  </script>
+</body>
