@@ -5,12 +5,12 @@
 
   module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
-    res.render("listings/index", { allListings });
+    res.render("Listings/index", { allListings });
     
   };
 
   module.exports.renderNewForm = (req, res) => {
-    res.render("listings/new");
+    res.render("Listings/new");
   };
 
   module.exports.createListing = async (req, res, next) => {
@@ -56,7 +56,7 @@
       return res.redirect("/listings");
     }
 
-    res.render("listings/show", { listing });
+    res.render("Listings/show", { listing });
   };
 
   module.exports.renderEditForm = async (req, res) => {
@@ -70,7 +70,7 @@
     let originalImageUrl = listing.image.url;
     originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
 
-    res.render("listings/edit", { listing, originalImageUrl });
+    res.render("Listings/edit", { listing, originalImageUrl });
   };
 
   module.exports.updateListing = async (req, res) => {
