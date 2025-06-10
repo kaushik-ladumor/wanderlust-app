@@ -1,3 +1,5 @@
+// app.js
+
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -12,89 +14,92 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const MongoStore = require("connect-mongo");
+
 const User = require("./models/user");
-const MongoStore = require('connect-mongo');
 
-// MongoDB Connection
-async function main() {
-  await mongoose.connect(process.env.MONGODB_URI);
-  console.log("MongoDB Connected Successfully");
-}
-main().catch((err) => console.error("MongoDB Connection Error:", err));
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("MongoDB Connected Successfully"))
+  .catch(err => console.error("MongoDB Connection Error:", err));
 
+// Session store in MongoDB
 const store = MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    crypto: {
-        secret: process.env.SESSION_SECRET || "fallbacksecret",
-    },
-    touchAfter: 24 * 3600,
+  mongoUrl: process.env.MONGODB_URI,
+  crypto: { secret: process.env.SESSION_SECRET || "fallbacksecret" },
+  touchAfter: 24 * 3600
 });
+store.on("error", err => console.log("Mongo Session Store Error:", err));
 
-store.on('error', function(err) {
-    console.log("Error in Mongo Session Store", err);
-});
-
-// Session Config
-const sessionOpt = {
+// Session setup
+app.use(session({
   store,
   secret: process.env.SESSION_SECRET || "fallbacksecret",
   resave: false,
-  saveUninitialized: true,
-  cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-  },
-};
-
-app.use(session(sessionOpt));
+  saveUninitialized: false,
+  cookie: { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }
+}));
 app.use(flash());
 
-// Passport Setup
+// Passport configuration
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy({ usernameField: "email" }, User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Middleware
+// Parse form and JSON data, override HTTP methods
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
+
+// Serve static files (CSS, JS, images)
 app.use(express.static(path.join(__dirname, "public")));
 
-// Global Middleware
-app.use((req, res, next) => {
-  res.locals.currUser = req.user;
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
-  res.locals.adminEmail = process.env.ADMIN_EMAIL; 
-  next();
-});
-
-// View Engine
+// View engine setup
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Routes
-const userRoute = require("./routes/user");
-const listingRoute = require("./routes/listing");
-const reviewRoute = require("./routes/review");
-const adminRoute = require("./routes/admin");
+// Global variables for templates
+app.use((req, res, next) => {
+  res.locals.currUser = req.user;
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.adminEmail = process.env.ADMIN_EMAIL;
+  next();
+});
 
-app.use("/", userRoute);
-app.use("/listings", listingRoute);
-app.use("/listings/:id/reviews", reviewRoute);
-app.use("/", adminRoute);
+// Redirect root "/" to "/listings"
+app.get("/", (req, res) => {
+  res.redirect("/listings");  // Redirect so root is handled by your listings route
+});
 
-// Error Handler
+// Route imports
+const userRoutes = require("./routes/user");
+const listingRoutes = require("./routes/listing");
+const reviewRoutes = require("./routes/review");
+const adminRoutes = require("./routes/admin");
+
+// Mount routes
+app.use("/", userRoutes);
+app.use("/listings", listingRoutes);
+app.use("/listings/:id/reviews", reviewRoutes);
+app.use("/", adminRoutes);
+
+// Handle undefined routes (404)
+app.get("*", (req, res) => {
+  res.status(404).render("error", { message: "Page Not Found!" });
+});
+
+// Centralized error handling
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = "Something went wrong!" } = err;
   res.status(statusCode).render("error", { message });
 });
 
-// Start Server
+// Start the server
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/listings`);
+  console.log(`✅ Server running at http://localhost:${port}`);
 });
