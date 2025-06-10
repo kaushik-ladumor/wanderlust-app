@@ -13,6 +13,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("./models/user");
+const MongoStore = require('connect-mongo');
 
 // MongoDB Connection
 async function main() {
@@ -21,8 +22,21 @@ async function main() {
 }
 main().catch((err) => console.error("MongoDB Connection Error:", err));
 
+const store = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    crypto: {
+        secret: process.env.SESSION_SECRET || "fallbacksecret",
+    },
+    touchAfter: 24 * 3600,
+});
+
+store.on('error', function(err) {
+    console.log("Error in Mongo Session Store", err);
+});
+
 // Session Config
 const sessionOpt = {
+  store,
   secret: process.env.SESSION_SECRET || "fallbacksecret",
   resave: false,
   saveUninitialized: true,
