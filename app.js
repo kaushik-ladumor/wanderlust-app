@@ -1,4 +1,3 @@
-// app.js
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -13,44 +12,44 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const MongoStore = require("connect-mongo");
-
 const User = require("./models/user");
+const MongoStore = require('connect-mongo');
 
-// Database Connection
-const dbUrl = process.env.MONGODB_URI || "mongodb://localhost:27017/yourdb";
-mongoose.connect(dbUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log("MongoDB Connected Successfully"))
-  .catch(err => {
-    console.error("MongoDB Connection Error:", err);
-    process.exit(1); // Exit if DB connection fails
-  });
+// MongoDB Connection
+async function main() {
+  await mongoose.connect(process.env.MONGODB_URI);
+  console.log("MongoDB Connected Successfully");
+}
+main().catch((err) => console.error("MongoDB Connection Error:", err));
 
-// Session Configuration
-const sessionConfig = {
-  store: MongoStore.create({
-    mongoUrl: dbUrl,
-    crypto: { secret: process.env.SESSION_SECRET || "fallbacksecret" },
-    touchAfter: 24 * 3600
-  }),
-  name: 'session',
+const store = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    crypto: {
+        secret: process.env.SESSION_SECRET || "fallbacksecret",
+    },
+    touchAfter: 24 * 3600,
+});
+
+store.on('error', function(err) {
+    console.log("Error in Mongo Session Store", err);
+});
+
+// Session Config
+const sessionOpt = {
+  store,
   secret: process.env.SESSION_SECRET || "fallbacksecret",
   resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    httpOnly: true, 
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000 
-  }
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
 };
 
-app.use(session(sessionConfig));
+app.use(session(sessionOpt));
 app.use(flash());
 
-// Passport Configuration
+// Passport Setup
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy({ usernameField: "email" }, User.authenticate()));
@@ -63,49 +62,50 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Global Middleware
+app.use((req, res, next) => {
+  res.locals.currUser = req.user;
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.adminEmail = process.env.ADMIN_EMAIL; 
+  next();
+});
+
 // View Engine
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Global Variables
-app.use((req, res, next) => {
-  res.locals.currentUser = req.user;
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
-  res.locals.adminEmail = process.env.ADMIN_EMAIL;
-  next();
-});
-
-// Route Imports
-const userRoutes = require("./routes/user");
-const listingRoutes = require("./routes/listing");
-const reviewRoutes = require("./routes/review");
-const adminRoutes = require("./routes/admin");
 
 // Routes
-app.get("/", (req, res) => res.redirect("/listings"));
+const userRoute = require("./routes/user");
+const listingRoute = require("./routes/listing");
+const reviewRoute = require("./routes/review");
+const adminRoute = require("./routes/admin");
 
-// Mount Routes with better organization
-app.use("/admin", adminRoutes);  // All admin routes under /admin
-app.use("/", userRoutes);        // User auth routes
-app.use("/listings", listingRoutes); // Listing routes
-app.use("/listings/:id/reviews", reviewRoutes); // Review routes
+app.use("/", userRoute);
+app.use("/listings", listingRoute);
+app.use("/listings/:id/reviews", reviewRoute);
+app.use("/", adminRoute);
 
-// Error Handling
-app.all("*", (req, res, next) => {
-  next(new ExpressError(404, "Page Not Found"));
+app.get("/", (req, res) => {
+  res.redirect("/listings");  // Redirect so root is handled by your listings route
 });
 
+
+// Error Handler
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = "Something went wrong!" } = err;
-  if (!res.headersSent) {
-    res.status(statusCode).render("error", { message });
-  }
+  res.status(statusCode).render("error", { message });
 });
 
-// Server
+app.get("/", (req, res) => {
+  res.redirect("/listings");  // Redirect so root is handled by your listings route
+});
+
+
+// Start Server
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
-  console.log(`✅ Server running on http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}/listings`);
 });

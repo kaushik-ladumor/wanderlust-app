@@ -1,19 +1,31 @@
 const express = require('express');
-const route = express.Router();
+const router = express.Router();
 const User = require('../models/user');
-const { isAdmin } = require('../middleware/Admin');
+const { isAdmin } = require('../middleware/Admin'); // ✅ Fixed import
 const { deleteUserAndRelatedData } = require('../controllers/auth');
 
-// Show all users
-route.get('/admin', isAdmin, async (req, res) => {
+// Admin Panel - Show all users
+router.get('/admin', isAdmin, async (req, res) => {
     const users = await User.find({});
     res.render('admin/HandleUser', { users });
 });
 
-// POST route (optional)
-route.post('/users/:id/delete', isAdmin, deleteUserAndRelatedData);
+// Delete user via POST
+router.post('/users/:id/delete', isAdmin, deleteUserAndRelatedData);
 
-// DELETE route (used by modal form)
-route.delete('/admin/users/:id', isAdmin, deleteUserAndRelatedData);
+// Delete user via DELETE (optional)
+router.delete('/admin/users/:id', isAdmin, async (req, res) => {
+    const { id } = req.params;
 
-module.exports = route;
+    // Prevent admin from deleting their own account
+    if (req.user._id.equals(id)) {
+        req.flash("error", "You can't delete yourself.");
+        return res.redirect('/admin');
+    }
+
+    await User.findByIdAndDelete(id);
+    req.flash("success", "User deleted.");
+    res.redirect('/admin');
+});
+
+module.exports = router;

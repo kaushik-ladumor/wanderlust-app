@@ -5,19 +5,19 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const { saveRedirectUrl } = require("../middleware/auth.js");
 const userController = require("../controllers/user.js");
 
-const route = express.Router();
+const router = express.Router();
 
 // Render Signup Form
-route.get("/signup", userController.renderSignupForm);
+router.get("/signup", userController.renderSignupForm);
 
 // Signup POST
-route.post("/signup", wrapAsync(userController.signup));
+router.post("/signup", wrapAsync(userController.signup));
 
 // Render Login Form
-route.get("/login", userController.renderLoginForm);
+router.get("/login", userController.renderLoginForm);
 
 // Login POST
-route.post(
+router.post(
   "/login",
   saveRedirectUrl,
   passport.authenticate("local", {
@@ -28,9 +28,9 @@ route.post(
 );
 
 // Email Verification
-route.post("/verify", wrapAsync(userController.verifyEmail));
+router.post("/verify", wrapAsync(userController.verifyEmail));
 
 // Logout
-route.post("/logout", userController.logout);
+router.post("/logout", userController.logout);
 
-module.exports = route;
+module.exports = router;

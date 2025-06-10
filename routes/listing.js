@@ -35,7 +35,7 @@ router
   .route("/:id")
   .get(wrapAsync(listingController.showListing))
   // Fix the image field name
-  .put(isLoggedIn, isListingAuthor, upload.single('listing[image]'), validateListing, wrapAsync(listingController.updateListing))
+  .put(isLoggedIn, isListingAuthor, upload.single('image'), validateListing, wrapAsync(listingController.updateListing))
   .delete(isLoggedIn, isListingAuthor, wrapAsync(listingController.deleteListing));
 
 // Edit Listing Form
