@@ -99,11 +99,6 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error", { message });
 });
 
-app.get("/", (req, res) => {
-  res.redirect("/listings");  // Redirect so root is handled by your listings route
-});
-
-
 // Start Server
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

@@ -1,7 +1,7 @@
 
 const User = require("../models/user.js");
 const { sendVerificationCode, sendWelcomeEmail } = require("../middleware/email.js");
-const passport = require("passport");
+
 
 exports.renderSignupForm = (req, res) => {
   res.render("user/signup.ejs");
