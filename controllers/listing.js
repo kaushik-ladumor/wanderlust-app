@@ -74,18 +74,38 @@
   };
 
   module.exports.updateListing = async (req, res) => {
-    const { id } = req.params;
-    let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  const { id } = req.params;
 
-    if (typeof req.file !== "undefined") {
-      let url = req.file.path;
-      let filename = req.file.path;
-      listing.image = { url, filename };
-      await listing.save();
+  // Update listing fields from form
+  let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing }, { new: true });
+
+  // If there's a new location, re-geocode and update geometry
+  if (req.body.listing.location) {
+    let response = await geocodingClient
+      .forwardGeocode({
+        query: req.body.listing.location,
+        limit: 1,
+      })
+      .send();
+
+    if (response.body.features.length > 0) {
+      listing.geometry = response.body.features[0].geometry;
     }
-    req.flash("success", "Listing Updated!");
-    res.redirect(`/listings/${id}`);
-  };
+  }
+
+  // If there's a new image uploaded
+  if (typeof req.file !== "undefined") {
+    let url = req.file.path;
+    let filename = req.file.filename;
+    listing.image = { url, filename };
+  }
+
+  await listing.save();
+
+  req.flash("success", "Listing Updated!");
+  res.redirect(`/listings/${id}`);
+};
+
 
   module.exports.deleteListing = async (req, res) => {
     const { id } = req.params;
