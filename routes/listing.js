@@ -8,6 +8,7 @@ const multer  = require('multer');
 const { storage } = require('../cloudConfing');
 const upload = multer({ storage });
 const { isLoggedIn, isListingAuthor } = require("../middleware/auth");
+const isVerified = require("../middleware/isVerify");
 
 // JOI Validation Middleware
 const validateListing = (req, res, next) => {
@@ -24,7 +25,7 @@ router
   .route("/")
   .get(wrapAsync(listingController.index))
   // Fix the image field name
-  .post(isLoggedIn, validateListing, upload.single('listing[image]'), wrapAsync(listingController.createListing));
+  .post(isLoggedIn, isVerified, validateListing, upload.single('listing[image]'), wrapAsync(listingController.createListing));
 
 
 // New Listing Form
