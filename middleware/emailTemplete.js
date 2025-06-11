@@ -183,7 +183,7 @@ exports.Welcome_Email_Template = `
                   <li>Dive into our <a href="https://wanderlust.com/blog" class="support-link">travel blog</a> for inspiration and expert tips.</li>
                   <li>Need assistance? Our team is just an email away at <a href="mailto:support@wanderlust.com" class="support-link">support@wanderlust.com</a>.</li>
               </ul>
-              <a href="https://wanderlust.com" class="button">Start Exploring Now</a>
+              <a href="https://wanderlust-app-b9uj.onrender.com/" class="button">Start Exploring Now</a>
               <p>Thank you for choosing <strong>WanderLust</strong>. Let’s make every moment an adventure!</p>
           </div>
           <div class="footer">
