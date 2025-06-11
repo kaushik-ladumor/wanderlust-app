@@ -9,7 +9,7 @@ const map = new mapboxgl.Map({
   container: "map", // Bootstrap handles the width
   style: "mapbox://styles/mapbox/streets-v11",
   center: parsedCoordinates,
-  zoom: 10,
+  zoom: 8,
 });
 
 // Responsive Resize Handler (optional but helpful for mobile)
