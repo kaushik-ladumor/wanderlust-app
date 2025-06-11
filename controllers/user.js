@@ -3,6 +3,7 @@ const User = require("../models/user.js");
 const { sendVerificationCode, sendWelcomeEmail } = require("../middleware/email.js");
 
 
+
 exports.renderSignupForm = (req, res) => {
   res.render("user/signup.ejs");
 };
@@ -33,12 +34,23 @@ exports.renderLoginForm = (req, res) => {
   res.render("user/login.ejs");
 };
 
-exports.login = (req, res) => {
+exports.login = async (req, res, next) => {
+  // Check if user is verified after login (Passport already authenticated the user)
+  if (!req.user.isVerified) {
+    req.logout((err) => {
+      if (err) return next(err);
+      req.flash("error", "Please verify your email before logging in.");
+      res.redirect("/signup"); // Or redirect to verify page
+    });
+    return;
+  }
+
   req.flash("success", "Welcome back!");
   const redirectUrl = res.locals.redirectUrl || "/listings";
   delete req.session.redirectUrl;
   res.redirect(redirectUrl);
 };
+
 
 exports.verifyEmail = async (req, res, next) => {
   const { code, email } = req.body;
