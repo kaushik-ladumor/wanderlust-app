@@ -36,7 +36,7 @@ Welcome to **Wanderlust**, a full-stack web app that lets users explore, list, a
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/kaushik-ladumor/wanderlust-app.git
-cd wanderlust-app
+cd wanderlust
 npm install
 touch .env
 node app.js
